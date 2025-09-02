@@ -1726,6 +1726,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		dropName := e.Func.Name != "last_over_time"
 
 		for i, s := range selVS.Series {
+			ev.logger.Info("Begin Series " + s.Labels().String())
 			if err := contextDone(ctx, "expression evaluation"); err != nil {
 				ev.error(err)
 			}
@@ -1748,6 +1749,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			}
 			inMatrix[0].Metric = selVS.Series[i].Labels()
 			for ts, step := ev.startTimestamp, -1; ts <= ev.endTimestamp; ts += ev.interval {
+				ev.logger.Info("Begin step " + s.Labels().String() + strconv.Itoa(step))
 				step++
 				// Set the non-matrix arguments.
 				// They are scalar, so it is safe to use the step number
