@@ -1598,7 +1598,9 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			fParam = val.(Matrix)[0].Floats[0].F
 		}
 		// Now fetch the data to be aggregated.
+		ev.logger.Info("Start eval")
 		val, ws := ev.eval(ctx, e.Expr)
+		ev.logger.Info("End eval")
 		warnings.Merge(ws)
 		inputMatrix := val.(Matrix)
 
