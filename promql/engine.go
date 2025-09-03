@@ -1729,9 +1729,12 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		// vector functions, the only change needed is to drop the
 		// metric name in the output.
 		dropName := e.Func.Name != "last_over_time"
+		var totalSeries int
+		var totalSteps int
 
 		for i, s := range selVS.Series {
 			//ev.logger.Info("Begin Series " + fmt.Sprintf("%d: %s", i, s.Labels().String()))
+			totalSeries++
 			if err := contextDone(ctx, "expression evaluation"); err != nil {
 				ev.error(err)
 			}
@@ -1754,6 +1757,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			}
 			inMatrix[0].Metric = selVS.Series[i].Labels()
 			for ts, step := ev.startTimestamp, -1; ts <= ev.endTimestamp; ts += ev.interval {
+				totalSteps++
 				step++
 				// Set the non-matrix arguments.
 				// They are scalar, so it is safe to use the step number
@@ -1823,6 +1827,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 				}
 			}
 		}
+		ev.logger.Info("jidai1 " + fmt.Sprintf("totalSeries: %d, totalSteps: %d", totalSeries, totalSteps))
 		ev.samplesStats.UpdatePeak(ev.currentSamples)
 
 		ev.currentSamples -= len(floats) + totalHPointSize(histograms)
