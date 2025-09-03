@@ -284,12 +284,12 @@ func (ev *evaluator) combineWithInfoSeries(ctx context.Context, mat, infoMat Mat
 		enh.Out = result[:0] // Reuse result vector.
 
 		vecNumSamples := result.TotalSamples()
-		ev.currentSamples += int64(vecNumSamples)
+		ev.currentSamples += vecNumSamples
 		// When we reset currentSamples to tempNumSamples during the next iteration of the loop it also
 		// needs to include the samples from the result here, as they're still in memory.
-		tempNumSamples += int64(vecNumSamples)
+		tempNumSamples += vecNumSamples
 		ev.samplesStats.UpdatePeak(ev.currentSamples)
-		if ev.currentSamples > int64(ev.maxSamples) {
+		if ev.currentSamples > ev.maxSamples {
 			ev.error(ErrTooManySamples(env))
 		}
 
@@ -324,7 +324,7 @@ func (ev *evaluator) combineWithInfoSeries(ctx context.Context, mat, infoMat Mat
 		numSamples += len(ss.Floats) + totalHPointSize(ss.Histograms)
 		output = append(output, ss.Series)
 	}
-	ev.currentSamples = originalNumSamples + int64(numSamples)
+	ev.currentSamples = originalNumSamples + numSamples
 	ev.samplesStats.UpdatePeak(ev.currentSamples)
 	return output, warnings
 }
