@@ -1827,6 +1827,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 				}
 			}
 		}
+		ev.logger.Info("jidai1 " + fmt.Sprintf("currentSamples: %d, maxSamples: %d", ev.currentSamples, ev.maxSamples))
 		ev.logger.Info("jidai1 " + fmt.Sprintf("totalSeries: %d, totalSteps: %d", totalSeries, totalSteps))
 		ev.samplesStats.UpdatePeak(ev.currentSamples)
 
