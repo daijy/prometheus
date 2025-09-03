@@ -1731,7 +1731,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		dropName := e.Func.Name != "last_over_time"
 
 		for i, s := range selVS.Series {
-			ev.logger.Info("Begin Series " + fmt.Sprintf("%d: %s", i, s.Labels().String()))
+			//ev.logger.Info("Begin Series " + fmt.Sprintf("%d: %s", i, s.Labels().String()))
 			if err := contextDone(ctx, "expression evaluation"); err != nil {
 				ev.error(err)
 			}
