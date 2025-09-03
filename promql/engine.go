@@ -2446,7 +2446,7 @@ loop:
 			break
 		}
 		ev.currentSamples += histograms[n].size()
-		if ev.currentSamples >= ev.maxSamples {
+		if ev.currentSamples >= ev.maxSamples || ev.currentSamples < 0 {
 			ev.error(ErrTooManySamples(env))
 		}
 
