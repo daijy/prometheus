@@ -105,7 +105,7 @@ type queryTimings struct {
 type querySamples struct {
 	TotalQueryableSamplesPerStep []stepStat `json:"totalQueryableSamplesPerStep,omitempty"`
 	TotalQueryableSamples        int64      `json:"totalQueryableSamples"`
-	PeakSamples                  int64      `json:"peakSamples"`
+	PeakSamples                  int        `json:"peakSamples"`
 }
 
 // BuiltinStats holds the statistics that Prometheus's core gathers.
@@ -232,7 +232,7 @@ type QuerySamples struct {
 	// while evaluating a query. It corresponds to the peak value of
 	// currentSamples, which is in turn compared against the MaxSamples
 	// configured in the engine.
-	PeakSamples int64
+	PeakSamples int
 
 	// TotalSamples represents the total number of samples scanned
 	// while evaluating a query.
@@ -294,7 +294,7 @@ func (qs *QuerySamples) IncrementSamplesAtTimestamp(t, samples int64) {
 
 // UpdatePeak updates the peak number of samples considered in
 // the evaluation of a query as used with the MaxSamples limit.
-func (qs *QuerySamples) UpdatePeak(samples int64) {
+func (qs *QuerySamples) UpdatePeak(samples int) {
 	if qs == nil {
 		return
 	}

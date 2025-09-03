@@ -1066,7 +1066,7 @@ type evaluator struct {
 	interval       int64 // Interval in milliseconds.
 
 	maxSamples               int
-	currentSamples           int64
+	currentSamples           int
 	logger                   *slog.Logger
 	lookbackDelta            time.Duration
 	samplesStats             *stats.QuerySamples
@@ -1254,13 +1254,13 @@ func (ev *evaluator) rangeEval(ctx context.Context, prepSeries func(labels.Label
 		warnings.Merge(ws)
 
 		vecNumSamples := result.TotalSamples()
-		ev.currentSamples += int64(vecNumSamples)
+		ev.currentSamples += vecNumSamples
 		// When we reset currentSamples to tempNumSamples during the next iteration of the loop it also
 		// needs to include the samples from the result here, as they're still in memory.
-		tempNumSamples += int64(vecNumSamples)
+		tempNumSamples += vecNumSamples
 		ev.samplesStats.UpdatePeak(ev.currentSamples)
 
-		if ev.currentSamples > int64(ev.maxSamples) {
+		if ev.currentSamples > ev.maxSamples {
 			ev.error(ErrTooManySamples(env))
 		}
 
@@ -1277,7 +1277,7 @@ func (ev *evaluator) rangeEval(ctx context.Context, prepSeries func(labels.Label
 					mat[i] = Series{Metric: s.Metric, Histograms: []HPoint{{T: ts, H: s.H}}, DropName: s.DropName}
 				}
 			}
-			ev.currentSamples = originalNumSamples + int64(mat.TotalSamples())
+			ev.currentSamples = originalNumSamples + mat.TotalSamples()
 			ev.samplesStats.UpdatePeak(ev.currentSamples)
 			return mat, warnings
 		}
@@ -1311,7 +1311,7 @@ func (ev *evaluator) rangeEval(ctx context.Context, prepSeries func(labels.Label
 	for _, ss := range seriess {
 		mat = append(mat, ss.Series)
 	}
-	ev.currentSamples = originalNumSamples + int64(mat.TotalSamples())
+	ev.currentSamples = originalNumSamples + mat.TotalSamples()
 	ev.samplesStats.UpdatePeak(ev.currentSamples)
 	return mat, warnings
 }
@@ -1419,7 +1419,7 @@ func (ev *evaluator) rangeEvalAgg(ctx context.Context, aggExpr *parser.Aggregate
 
 		warnings.Merge(ws)
 
-		if ev.currentSamples > int64(ev.maxSamples) {
+		if ev.currentSamples > ev.maxSamples {
 			ev.error(ErrTooManySamples(env))
 		}
 	}
@@ -1477,7 +1477,7 @@ func (ev *evaluator) evalSeries(ctx context.Context, series []storage.Series, of
 			if h == nil {
 				ev.currentSamples++
 				ev.samplesStats.IncrementSamplesAtStep(step, 1)
-				if ev.currentSamples > int64(ev.maxSamples) {
+				if ev.currentSamples > ev.maxSamples {
 					ev.error(ErrTooManySamples(env))
 				}
 				if ss.Floats == nil {
@@ -1497,9 +1497,9 @@ func (ev *evaluator) evalSeries(ctx context.Context, series []storage.Series, of
 
 				point := HPoint{H: h, T: ts}
 				histSize := point.size()
-				ev.currentSamples += int64(histSize)
+				ev.currentSamples += histSize
 				ev.samplesStats.IncrementSamplesAtStep(step, int64(histSize))
-				if ev.currentSamples > int64(ev.maxSamples) {
+				if ev.currentSamples > ev.maxSamples {
 					ev.error(ErrTooManySamples(env))
 				}
 				if ss.Histograms == nil {
@@ -1611,7 +1611,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 
 		result, ws := ev.rangeEvalAgg(ctx, e, sortedGrouping, inputMatrix, fParam)
 		warnings.Merge(ws)
-		ev.currentSamples = originalNumSamples + int64(result.TotalSamples())
+		ev.currentSamples = originalNumSamples + result.TotalSamples()
 		ev.samplesStats.UpdatePeak(ev.currentSamples)
 
 		return result, warnings
@@ -1657,7 +1657,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 				defer func() {
 					// subquery result takes space in the memory. Get rid of that at the end.
 					val.VectorSelector.(*parser.VectorSelector).Series = nil
-					ev.currentSamples -= int64(totalSamples)
+					ev.currentSamples -= totalSamples
 				}()
 				break
 			}
@@ -1738,7 +1738,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			if err := contextDone(ctx, "expression evaluation"); err != nil {
 				ev.error(err)
 			}
-			ev.currentSamples -= int64(len(floats) + totalHPointSize(histograms))
+			ev.currentSamples -= len(floats) + totalHPointSize(histograms)
 			if floats != nil {
 				floats = floats[:0]
 			}
@@ -1807,12 +1807,12 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			histSamples := totalHPointSize(ss.Histograms)
 
 			if len(ss.Floats)+histSamples > 0 {
-				if ev.currentSamples+int64(len(ss.Floats)+histSamples) > int64(ev.maxSamples) {
+				if ev.currentSamples+len(ss.Floats)+histSamples > ev.maxSamples {
 					ev.error(ErrTooManySamples(env))
 				}
 				mat = append(mat, ss)
 				prevSS = &mat[len(mat)-1]
-				ev.currentSamples += int64(len(ss.Floats) + histSamples)
+				ev.currentSamples += len(ss.Floats) + histSamples
 			}
 			ev.samplesStats.UpdatePeak(ev.currentSamples)
 
@@ -1831,7 +1831,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		ev.logger.Info("jidai1 " + fmt.Sprintf("totalSeries: %d, totalSteps: %d", totalSeries, totalSteps))
 		ev.samplesStats.UpdatePeak(ev.currentSamples)
 
-		ev.currentSamples -= int64(len(floats) + totalHPointSize(histograms))
+		ev.currentSamples -= len(floats) + totalHPointSize(histograms)
 		putFPointSlice(floats)
 		putMatrixSelectorHPointSlice(histograms)
 
@@ -2075,9 +2075,9 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 						H: mat[i].Histograms[0].H,
 					}
 					mat[i].Histograms = append(mat[i].Histograms, point)
-					ev.currentSamples += int64(point.size())
+					ev.currentSamples += point.size()
 				}
-				if ev.currentSamples > int64(ev.maxSamples) {
+				if ev.currentSamples > ev.maxSamples {
 					ev.error(ErrTooManySamples(env))
 				}
 			}
@@ -2149,7 +2149,7 @@ func (ev *evaluator) rangeEvalTimestampFunctionOverVectorSelector(ctx context.Co
 
 			ev.currentSamples++
 			ev.samplesStats.IncrementSamplesAtTimestamp(enh.Ts, 1)
-			if ev.currentSamples > int64(ev.maxSamples) {
+			if ev.currentSamples > ev.maxSamples {
 				ev.error(ErrTooManySamples(env))
 			}
 		}
@@ -2327,13 +2327,13 @@ func (ev *evaluator) matrixIterSlice(
 		var drop int
 		for drop = 0; floats[drop].T <= mint; drop++ {
 		}
-		ev.currentSamples -= int64(drop)
+		ev.currentSamples -= drop
 		copy(floats, floats[drop:])
 		floats = floats[:len(floats)-drop]
 		// Only append points with timestamps after the last timestamp we have.
 		mintFloats = floats[len(floats)-1].T
 	} else {
-		ev.currentSamples -= int64(len(floats))
+		ev.currentSamples -= len(floats)
 		if floats != nil {
 			floats = floats[:0]
 		}
@@ -2356,11 +2356,11 @@ func (ev *evaluator) matrixIterSlice(
 		copy(histograms, histograms[drop:])
 		copy(histograms[len(histograms)-drop:], tail)
 		histograms = histograms[:len(histograms)-drop]
-		ev.currentSamples -= int64(totalHPointSize(histograms))
+		ev.currentSamples -= totalHPointSize(histograms)
 		// Only append points with timestamps after the last timestamp we have.
 		mintHistograms = histograms[len(histograms)-1].T
 	} else {
-		ev.currentSamples -= int64(totalHPointSize(histograms))
+		ev.currentSamples -= totalHPointSize(histograms)
 		if histograms != nil {
 			histograms = histograms[:0]
 		}
@@ -2397,8 +2397,8 @@ loop:
 					histograms = histograms[:n]
 					continue loop
 				}
-				ev.currentSamples += int64(histograms[n].size())
-				if ev.currentSamples > int64(ev.maxSamples) {
+				ev.currentSamples += histograms[n].size()
+				if ev.currentSamples > ev.maxSamples {
 					ev.error(ErrTooManySamples(env))
 				}
 			}
@@ -2410,7 +2410,7 @@ loop:
 			// Values in the buffer are guaranteed to be smaller than maxt.
 			if t > mintFloats {
 				ev.currentSamples++
-				if ev.currentSamples > int64(ev.maxSamples) {
+				if ev.currentSamples > ev.maxSamples {
 					ev.error(ErrTooManySamples(env))
 				}
 				if floats == nil {
@@ -2445,8 +2445,8 @@ loop:
 			histograms = histograms[:n]
 			break
 		}
-		ev.currentSamples += int64(histograms[n].size())
-		if ev.currentSamples > int64(ev.maxSamples) {
+		ev.currentSamples += histograms[n].size()
+		if ev.currentSamples > ev.maxSamples {
 			ev.error(ErrTooManySamples(env))
 		}
 
@@ -2454,7 +2454,7 @@ loop:
 		t, f := it.At()
 		if t == maxt && !value.IsStaleNaN(f) {
 			ev.currentSamples++
-			if ev.currentSamples > int64(ev.maxSamples) {
+			if ev.currentSamples > ev.maxSamples {
 				ev.error(ErrTooManySamples(env))
 			}
 			if floats == nil {
@@ -3845,7 +3845,7 @@ func (ev *evaluator) gatherVector(ts int64, input Matrix, output Vector, bufHelp
 		// copy the pointer above, not the whole
 		// histogram.
 		ev.currentSamples++
-		if ev.currentSamples > int64(ev.maxSamples) {
+		if ev.currentSamples > ev.maxSamples {
 			ev.error(ErrTooManySamples(env))
 		}
 	}
