@@ -22,8 +22,10 @@ import (
 	"io"
 	"log/slog"
 	"math"
+	"os"
 	"reflect"
 	"runtime"
+	"runtime/pprof"
 	"slices"
 	"sort"
 	"strconv"
@@ -1598,9 +1600,12 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			fParam = val.(Matrix)[0].Floats[0].F
 		}
 		// Now fetch the data to be aggregated.
+		f, _ := os.Create("/data/1.hprof")
+		pprof.StartCPUProfile(f)
 		ev.logger.Info("Start eval")
 		val, ws := ev.eval(ctx, e.Expr)
 		ev.logger.Info("End eval")
+		pprof.StopCPUProfile()
 		warnings.Merge(ws)
 		inputMatrix := val.(Matrix)
 
