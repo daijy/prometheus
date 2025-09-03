@@ -1067,7 +1067,7 @@ type evaluator struct {
 
 	maxSamples               int
 	currentSamples           int
-	totalSamples             int64
+	totalFakeSamples         int64
 	logger                   *slog.Logger
 	lookbackDelta            time.Duration
 	samplesStats             *stats.QuerySamples
@@ -1828,7 +1828,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 				}
 			}
 		}
-		ev.logger.Info("jidai1 " + fmt.Sprintf("totalSamples: %d, maxSamples: %d", ev.totalSamples, ev.maxSamples))
+		ev.logger.Info("jidai1 " + fmt.Sprintf("totalSamples: %d, maxSamples: %d", ev.totalFakeSamples, ev.maxSamples))
 		ev.logger.Info("jidai1 " + fmt.Sprintf("totalSeries: %d, totalSteps: %d", totalSeries, totalSteps))
 		ev.samplesStats.UpdatePeak(ev.currentSamples)
 
@@ -2399,6 +2399,7 @@ loop:
 					continue loop
 				}
 				ev.currentSamples += histograms[n].size()
+				ev.totalFakeSamples += int64(histograms[n].size())
 				if ev.currentSamples > ev.maxSamples {
 					ev.error(ErrTooManySamples(env))
 				}
@@ -2411,7 +2412,7 @@ loop:
 			// Values in the buffer are guaranteed to be smaller than maxt.
 			if t > mintFloats {
 				ev.currentSamples++
-				ev.totalSamples++
+				ev.totalFakeSamples++
 				if ev.currentSamples > ev.maxSamples {
 					ev.error(ErrTooManySamples(env))
 				}
@@ -2448,6 +2449,7 @@ loop:
 			break
 		}
 		ev.currentSamples += histograms[n].size()
+		ev.totalFakeSamples += int64(histograms[n].size())
 		if ev.currentSamples > ev.maxSamples {
 			ev.error(ErrTooManySamples(env))
 		}
@@ -2456,7 +2458,7 @@ loop:
 		t, f := it.At()
 		if t == maxt && !value.IsStaleNaN(f) {
 			ev.currentSamples++
-			ev.totalSamples++
+			ev.totalFakeSamples++
 			if ev.currentSamples > ev.maxSamples {
 				ev.error(ErrTooManySamples(env))
 			}
