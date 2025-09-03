@@ -2464,7 +2464,6 @@ loop:
 		}
 	}
 	ev.samplesStats.UpdatePeak(ev.currentSamples)
-	ev.logger.Info(fmt.Sprintf("jidai2: %d, %d", len(floats), len(histograms)))
 	return floats, histograms
 }
 
