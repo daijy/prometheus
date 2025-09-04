@@ -1733,8 +1733,6 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		dropName := e.Func.Name != "last_over_time"
 		var totalSeries int
 		var totalSteps int
-		var printcount int
-		printcount = 0
 
 		for i, s := range selVS.Series {
 			//ev.logger.Info("Begin Series " + fmt.Sprintf("%d: %s", i, s.Labels().String()))
@@ -1779,11 +1777,6 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 					mint := maxt - selRange
 					floats, histograms = ev.matrixIterSlice(it, mint, maxt, floats, histograms)
 				}
-				if printcount < 1000 {
-					ev.logger.Info("jidai2 " + fmt.Sprintf("series: %d, step: %d, ts: %d, len(floats): %d, len(histograms): %d", i, step, ts, len(floats), len(histograms)))
-					ev.logger.Info("jidai3 " + fmt.Sprintf("%T", call))
-					printcount++
-				}
 				if len(floats)+len(histograms) == 0 {
 					continue
 				}
@@ -1792,6 +1785,11 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 				enh.Ts = ts
 				// Make the function call.
 				outVec, annos := call(inArgs, e.Args, enh)
+				if i%1000 == 248 && step == 1 {
+					ev.logger.Info("jidai2 " + fmt.Sprintf("series: %d, step: %d, ts: %d, len(floats): %d, len(histograms): %d", i, step, ts, len(floats), len(histograms)))
+					ev.logger.Info("jidai3 " + e.Func.Name)
+					ev.logger.Info("jidai4 " + fmt.Sprintf("%d", outVec.TotalSamples()))
+				}
 				warnings.Merge(annos)
 				ev.samplesStats.IncrementSamplesAtStep(step, int64(len(floats)+totalHPointSize(histograms)))
 
