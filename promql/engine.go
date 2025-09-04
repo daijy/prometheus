@@ -1068,6 +1068,7 @@ type evaluator struct {
 	maxSamples               int
 	currentSamples           int
 	totalFakeSamples         int64
+	totalFakeHistograms      int64
 	logger                   *slog.Logger
 	lookbackDelta            time.Duration
 	samplesStats             *stats.QuerySamples
@@ -2399,7 +2400,7 @@ loop:
 					continue loop
 				}
 				ev.currentSamples += histograms[n].size()
-				ev.totalFakeSamples += int64(histograms[n].size())
+				ev.totalFakeHistograms += int64(histograms[n].size())
 				if ev.currentSamples > ev.maxSamples {
 					ev.error(ErrTooManySamples(env))
 				}
@@ -2449,7 +2450,7 @@ loop:
 			break
 		}
 		ev.currentSamples += histograms[n].size()
-		ev.totalFakeSamples += int64(histograms[n].size())
+		ev.totalFakeHistograms += int64(histograms[n].size())
 		if ev.currentSamples > ev.maxSamples {
 			ev.error(ErrTooManySamples(env))
 		}
