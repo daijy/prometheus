@@ -1609,7 +1609,11 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		// pprof.StopCPUProfile()
 		warnings.Merge(ws)
 		inputMatrix := val.(Matrix)
-		ev.logger.Info(fmt.Sprintf("jidai7 inputMatrix %d", inputMatrix.Len()))
+		var totalInputSamples int64
+		for _, s := range inputMatrix {
+			totalInputSamples += int64(len(s.Floats) + len(s.Histograms))
+		}
+		ev.logger.Info(fmt.Sprintf("jidai7 inputMatrix %d", totalInputSamples))
 
 		result, ws := ev.rangeEvalAgg(ctx, e, sortedGrouping, inputMatrix, fParam)
 		warnings.Merge(ws)
@@ -1712,7 +1716,6 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		mat := make(Matrix, 0, len(selVS.Series)) // Output matrix.
 		offset := durationMilliseconds(selVS.Offset)
 		selRange := durationMilliseconds(sel.Range)
-		ev.logger.Info("jidai3 " + fmt.Sprintf("offset: %d, selRange: %d", offset, selRange))
 		stepRange := selRange
 		if stepRange > ev.interval {
 			stepRange = ev.interval
