@@ -1571,6 +1571,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 	switch e := expr.(type) {
 	case *parser.AggregateExpr:
 		// Grouping labels must be sorted (expected both by generateGroupingKey() and aggregation()).
+		ev.logger.Info("jidai8 Now aggregate")
 		sortedGrouping := e.Grouping
 		slices.Sort(sortedGrouping)
 
@@ -1616,6 +1617,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		ev.currentSamples = originalNumSamples + result.TotalSamples()
 		ev.samplesStats.UpdatePeak(ev.currentSamples)
 
+		ev.logger.Info("jidai8 aggregate done")
 		return result, warnings
 
 	case *parser.Call:
