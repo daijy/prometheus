@@ -1609,11 +1609,6 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		// pprof.StopCPUProfile()
 		warnings.Merge(ws)
 		inputMatrix := val.(Matrix)
-		var totalInputSamples int64
-		for _, s := range inputMatrix {
-			totalInputSamples += int64(len(s.Floats) + len(s.Histograms))
-		}
-		ev.logger.Info(fmt.Sprintf("jidai7 inputMatrix %d", totalInputSamples))
 
 		result, ws := ev.rangeEvalAgg(ctx, e, sortedGrouping, inputMatrix, fParam)
 		warnings.Merge(ws)
