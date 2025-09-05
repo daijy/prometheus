@@ -22,10 +22,8 @@ import (
 	"io"
 	"log/slog"
 	"math"
-	"os"
 	"reflect"
 	"runtime"
-	"runtime/pprof"
 	"slices"
 	"sort"
 	"strconv"
@@ -1603,14 +1601,15 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			fParam = val.(Matrix)[0].Floats[0].F
 		}
 		// Now fetch the data to be aggregated.
-		f, _ := os.Create("/data/1.hprof")
-		pprof.StartCPUProfile(f)
+		// f, _ := os.Create("/data/1.hprof")
+		// pprof.StartCPUProfile(f)
 		ev.logger.Info("Start eval")
 		val, ws := ev.eval(ctx, e.Expr)
 		ev.logger.Info("End eval")
-		pprof.StopCPUProfile()
+		// pprof.StopCPUProfile()
 		warnings.Merge(ws)
 		inputMatrix := val.(Matrix)
+		ev.logger.Info(fmt.Sprintf("jidai7 inputMatrix %d", inputMatrix.Len()))
 
 		result, ws := ev.rangeEvalAgg(ctx, e, sortedGrouping, inputMatrix, fParam)
 		warnings.Merge(ws)
@@ -1787,11 +1786,11 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 				enh.Ts = ts
 				// Make the function call.
 				outVec, annos := call(inArgs, e.Args, enh)
-				if i%1000 == 248 && step == 1 {
-					ev.logger.Info("jidai2 " + fmt.Sprintf("series: %d, step: %d, ts: %d, len(floats): %d, len(histograms): %d", i, step, ts, len(floats), len(histograms)))
-					ev.logger.Info("jidai3 " + e.Func.Name)
-					ev.logger.Info("jidai4 " + fmt.Sprintf("%d", outVec.TotalSamples()))
-				}
+				// if i%1000 == 248 && step == 1 {
+				// 	ev.logger.Info("jidai2 " + fmt.Sprintf("series: %d, step: %d, ts: %d, len(floats): %d, len(histograms): %d", i, step, ts, len(floats), len(histograms)))
+				// 	ev.logger.Info("jidai3 " + e.Func.Name)
+				// 	ev.logger.Info("jidai4 " + fmt.Sprintf("%d", outVec.TotalSamples()))
+				// }
 				warnings.Merge(annos)
 				ev.samplesStats.IncrementSamplesAtStep(step, int64(len(floats)+totalHPointSize(histograms)))
 
