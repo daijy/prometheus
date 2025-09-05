@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	logger "log"
 	"log/slog"
 	"math"
 	"reflect"
@@ -1044,6 +1045,7 @@ func expandSeriesSet(ctx context.Context, it storage.SeriesSet) (res []storage.S
 		}
 		res = append(res, it.At())
 	}
+	logger.Printf("jidai 12: res len %d", len(res))
 	return res, it.Warnings(), it.Err()
 }
 
