@@ -1697,6 +1697,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			}
 		}
 
+		ev.logger.Info("jidai11")
 		unwrapParenExpr(&e.Args[matrixArgIndex])
 		arg := unwrapStepInvariantExpr(e.Args[matrixArgIndex])
 		unwrapParenExpr(&arg)
@@ -1734,6 +1735,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		var totalSeries int
 		var totalSteps int
 
+		ev.logger.Info("jidai10")
 		for i, s := range selVS.Series {
 			//ev.logger.Info("Begin Series " + fmt.Sprintf("%d: %s", i, s.Labels().String()))
 			if i == 1 {
