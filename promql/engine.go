@@ -1712,6 +1712,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		mat := make(Matrix, 0, len(selVS.Series)) // Output matrix.
 		offset := durationMilliseconds(selVS.Offset)
 		selRange := durationMilliseconds(sel.Range)
+		ev.logger.Info("jidai3 " + fmt.Sprintf("offset: %d, selRange: %d", offset, selRange))
 		stepRange := selRange
 		if stepRange > ev.interval {
 			stepRange = ev.interval
