@@ -1736,6 +1736,9 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 
 		for i, s := range selVS.Series {
 			//ev.logger.Info("Begin Series " + fmt.Sprintf("%d: %s", i, s.Labels().String()))
+			if i == 1 {
+				ev.logger.Info("jidai9 type of s %T", s)
+			}
 			totalSeries++
 			if err := contextDone(ctx, "expression evaluation"); err != nil {
 				ev.error(err)
