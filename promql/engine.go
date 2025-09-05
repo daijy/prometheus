@@ -1045,7 +1045,7 @@ func expandSeriesSet(ctx context.Context, it storage.SeriesSet) (res []storage.S
 		}
 		res = append(res, it.At())
 	}
-	logger.Printf("jidai 12: res len %d", len(res))
+	logger.Printf("jidai 12: res lens %d, %T", len(res), res[0])
 	return res, it.Warnings(), it.Err()
 }
 
