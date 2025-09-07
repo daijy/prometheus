@@ -1552,6 +1552,27 @@ func (ev *evaluator) evalSubquery(ctx context.Context, subq *parser.SubqueryExpr
 	return ms, mat.TotalSamples(), ws
 }
 
+func goid() (int, error) {
+	var goroutinePrefix = []byte("goroutine ")
+	var errBadStack = errors.New("invalid runtime.Stack output")
+	buf := make([]byte, 32)
+	n := runtime.Stack(buf, false)
+	buf = buf[:n]
+	// goroutine 1 [running]: ...
+
+	buf, ok := bytes.CutPrefix(buf, goroutinePrefix)
+	if !ok {
+		return 0, errBadStack
+	}
+
+	i := bytes.IndexByte(buf, ' ')
+	if i < 0 {
+		return 0, errBadStack
+	}
+
+	return strconv.Atoi(string(buf[:i]))
+}
+
 // eval evaluates the given expression as the given AST expression node requires.
 func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, annotations.Annotations) {
 	// This is the top-level evaluation method.
@@ -1737,7 +1758,8 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		var totalSeries int
 		var totalSteps int
 
-		ev.logger.Info("jidai10")
+		id, _ := goid()
+		ev.logger.Info(fmt.Sprintf("jidai10: %d", id))
 		for i, s := range selVS.Series {
 			//ev.logger.Info("Begin Series " + fmt.Sprintf("%d: %s", i, s.Labels().String()))
 			if i == 1 {
