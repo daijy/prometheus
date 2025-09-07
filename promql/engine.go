@@ -23,10 +23,8 @@ import (
 	logger "log"
 	"log/slog"
 	"math"
-	"os"
 	"reflect"
 	"runtime"
-	"runtime/pprof"
 	"slices"
 	"sort"
 	"strconv"
@@ -1614,12 +1612,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		warnings.Merge(ws)
 		inputMatrix := val.(Matrix)
 
-		f, _ := os.Create("/data/3.hprof")
-		ev.logger.Info("jidai_meme start")
-		pprof.StartCPUProfile(f)
 		result, ws := ev.rangeEvalAgg(ctx, e, sortedGrouping, inputMatrix, fParam)
-		pprof.StopCPUProfile()
-		ev.logger.Info("jidai_meme end")
 		warnings.Merge(ws)
 		ev.currentSamples = originalNumSamples + result.TotalSamples()
 		ev.samplesStats.UpdatePeak(ev.currentSamples)
