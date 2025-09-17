@@ -18,6 +18,7 @@ import (
 	"container/heap"
 	"context"
 	"fmt"
+	"log"
 	"math"
 	"runtime/debug"
 	"sync"
