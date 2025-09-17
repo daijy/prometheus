@@ -376,6 +376,8 @@ func newGenericMergeSeriesSet(sets []genericSeriesSet, seriesLimit int, mergeFun
 	}
 }
 
+var counter2 = 0
+
 func (c *genericMergeSeriesSet) Next() bool {
 	if c.seriesLimit > 0 && c.mergedSeries >= c.seriesLimit {
 		// Exit early if seriesLimit is set.
@@ -413,7 +415,8 @@ func (c *genericMergeSeriesSet) Next() bool {
 		}
 	}
 	c.mergedSeries++
-	log.Print("genericMergeSeriesSet.Next")
+	log.Printf("genericMergeSeriesSet.Next %d", counter2)
+	counter2++
 	return true
 }
 
