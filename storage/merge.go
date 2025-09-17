@@ -415,7 +415,10 @@ func (c *genericMergeSeriesSet) Next() bool {
 		}
 	}
 	c.mergedSeries++
-	log.Printf("genericMergeSeriesSet.Next %d", counter2)
+	if counter2 == 2868807 {
+		debug.PrintStack()
+		log.Printf("genericMergeSeriesSet.Next %d", counter2)
+	}
 	counter2++
 	return true
 }
