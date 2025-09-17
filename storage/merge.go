@@ -413,6 +413,7 @@ func (c *genericMergeSeriesSet) Next() bool {
 		}
 	}
 	c.mergedSeries++
+	log.Print("genericMergeSeriesSet.Next")
 	return true
 }
 
