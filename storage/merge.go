@@ -18,6 +18,7 @@ import (
 	"container/heap"
 	"context"
 	"fmt"
+	"log"
 	"math"
 	"sync"
 
@@ -367,6 +368,7 @@ func newGenericMergeSeriesSet(sets []genericSeriesSet, seriesLimit int, mergeFun
 }
 
 func (c *genericMergeSeriesSet) Next() bool {
+	log.Print("genericMergeSeriesSet.Next called")
 	if c.seriesLimit > 0 && c.mergedSeries >= c.seriesLimit {
 		// Exit early if seriesLimit is set.
 		return false
