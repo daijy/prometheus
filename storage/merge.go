@@ -18,7 +18,9 @@ import (
 	"container/heap"
 	"context"
 	"fmt"
+	"log"
 	"math"
+	"runtime/debug"
 	"sync"
 
 	"github.com/prometheus/prometheus/model/histogram"
@@ -339,7 +341,15 @@ type genericMergeSeriesSet struct {
 // merged series set will be incorrect.
 // Overlapped situations are merged using provided mergeFunc.
 // If seriesLimit is set, only limited series are returned.
+var counter = 0
+
 func newGenericMergeSeriesSet(sets []genericSeriesSet, seriesLimit int, mergeFunc genericSeriesMergeFunc) genericSeriesSet {
+	if counter <= 10 {
+		log.Printf("newGenericMergeSeriesSet called, %d genericSeriesSet of %T", len(sets), sets[0])
+		debug.PrintStack()
+		counter++
+	}
+
 	if len(sets) == 1 {
 		return sets[0]
 	}
