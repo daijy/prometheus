@@ -1638,7 +1638,7 @@ func (ev *evaluator) evalSubquery(ctx context.Context, subq *parser.SubqueryExpr
 func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, annotations.Annotations) {
 	// This is the top-level evaluation method.
 	// Thus, we check for timeout/cancellation here.
-	log.Println("here3")
+	log.Printf("here3 %s", expr.String())
 	if err := contextDone(ctx, "expression evaluation"); err != nil {
 		ev.error(err)
 	}
