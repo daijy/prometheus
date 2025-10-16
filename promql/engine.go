@@ -25,6 +25,7 @@ import (
 	"math"
 	"reflect"
 	"runtime"
+	"runtime/debug"
 	"slices"
 	"sort"
 	"strconv"
@@ -1656,6 +1657,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		span.SetAttributes(attribute.String("operation", ss.ShortString()))
 	}
 
+	debug.PrintStack()
 	log.Printf("here3 %s, %v", expr.String(), expr)
 	switch e := expr.(type) {
 	case *parser.AggregateExpr:
