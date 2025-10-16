@@ -25,7 +25,6 @@ import (
 	"math"
 	"reflect"
 	"runtime"
-	"runtime/debug"
 	"slices"
 	"sort"
 	"strconv"
@@ -1029,9 +1028,7 @@ func checkAndExpandSeriesSet(ctx context.Context, expr parser.Expr) (annotations
 		}
 		span := trace.SpanFromContext(ctx)
 		span.AddEvent("expand start", trace.WithAttributes(attribute.String("selector", e.String())))
-		log.Println("here9")
 		series, ws, err := expandSeriesSet(ctx, e.UnexpandedSeriesSet)
-		log.Println("here10")
 		if e.SkipHistogramBuckets {
 			for i := range series {
 				series[i] = newHistogramStatsSeries(series[i])
@@ -1045,6 +1042,7 @@ func checkAndExpandSeriesSet(ctx context.Context, expr parser.Expr) (annotations
 }
 
 func expandSeriesSet(ctx context.Context, it storage.SeriesSet) (res []storage.Series, ws annotations.Annotations, err error) {
+	log.Printf("jidai7 %T", it)
 	for it.Next() {
 		select {
 		case <-ctx.Done():
@@ -1053,6 +1051,7 @@ func expandSeriesSet(ctx context.Context, it storage.SeriesSet) (res []storage.S
 		}
 		res = append(res, it.At())
 	}
+	log.Printf("jidai8 %d", len(res))
 	return res, it.Warnings(), it.Err()
 }
 
@@ -1704,7 +1703,6 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		return result, warnings
 
 	case *parser.Call:
-		debug.PrintStack()
 		call := FunctionCalls[e.Func.Name]
 		if e.Func.Name == "timestamp" {
 			// Matrix evaluation always returns the evaluation time,
@@ -1726,7 +1724,6 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			warnings       annotations.Annotations
 		)
 		for i := range e.Args {
-			log.Println("here7")
 			unwrapParenExpr(&e.Args[i])
 			a := unwrapStepInvariantExpr(e.Args[i])
 			unwrapParenExpr(&a)
@@ -1737,7 +1734,6 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			}
 			// parser.SubqueryExpr can be used in place of parser.MatrixSelector.
 			if subq, ok := a.(*parser.SubqueryExpr); ok {
-				log.Println("here8")
 				matrixArgIndex = i
 				matrixArg = true
 				// Replacing parser.SubqueryExpr with parser.MatrixSelector.
