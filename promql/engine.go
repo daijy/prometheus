@@ -1656,10 +1656,10 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		span.SetAttributes(attribute.String("operation", ss.ShortString()))
 	}
 
-	log.Printf("here4 %s", expr.String())
 	switch e := expr.(type) {
 	case *parser.AggregateExpr:
 		// Grouping labels must be sorted (expected both by generateGroupingKey() and aggregation()).
+		log.Printf("here4 %s", expr.String())
 		sortedGrouping := e.Grouping
 		slices.Sort(sortedGrouping)
 
@@ -1703,6 +1703,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		return result, warnings
 
 	case *parser.Call:
+		log.Printf("here6 %s", expr.String())
 		call := FunctionCalls[e.Func.Name]
 		if e.Func.Name == "timestamp" {
 			// Matrix evaluation always returns the evaluation time,
