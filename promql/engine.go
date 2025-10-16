@@ -25,6 +25,7 @@ import (
 	"math"
 	"reflect"
 	"runtime"
+	"runtime/debug"
 	"slices"
 	"sort"
 	"strconv"
@@ -1701,6 +1702,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		return result, warnings
 
 	case *parser.Call:
+		debug.PrintStack()
 		call := FunctionCalls[e.Func.Name]
 		if e.Func.Name == "timestamp" {
 			// Matrix evaluation always returns the evaluation time,
@@ -1722,6 +1724,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			warnings       annotations.Annotations
 		)
 		for i := range e.Args {
+			log.Println("here7")
 			unwrapParenExpr(&e.Args[i])
 			a := unwrapStepInvariantExpr(e.Args[i])
 			unwrapParenExpr(&a)
@@ -1732,6 +1735,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 			}
 			// parser.SubqueryExpr can be used in place of parser.MatrixSelector.
 			if subq, ok := a.(*parser.SubqueryExpr); ok {
+				log.Println("here8")
 				matrixArgIndex = i
 				matrixArg = true
 				// Replacing parser.SubqueryExpr with parser.MatrixSelector.
