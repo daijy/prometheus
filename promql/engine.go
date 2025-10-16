@@ -1638,7 +1638,6 @@ func (ev *evaluator) evalSubquery(ctx context.Context, subq *parser.SubqueryExpr
 func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, annotations.Annotations) {
 	// This is the top-level evaluation method.
 	// Thus, we check for timeout/cancellation here.
-	log.Printf("here3 %s", expr.String())
 	if err := contextDone(ctx, "expression evaluation"); err != nil {
 		ev.error(err)
 	}
@@ -1656,9 +1655,11 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		span.SetAttributes(attribute.String("operation", ss.ShortString()))
 	}
 
+	log.Printf("here3 %s, %v", expr.String(), expr)
 	switch e := expr.(type) {
 	case *parser.AggregateExpr:
 		// Grouping labels must be sorted (expected both by generateGroupingKey() and aggregation()).
+		log.Println("here4")
 		sortedGrouping := e.Grouping
 		slices.Sort(sortedGrouping)
 
@@ -1675,7 +1676,6 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 				sortedGrouping = append(sortedGrouping, valueLabel.Val)
 				slices.Sort(sortedGrouping)
 			}
-			log.Println("here4")
 			return ev.rangeEval(ctx, nil, func(v []parser.Value, _ [][]EvalSeriesHelper, enh *EvalNodeHelper) (Vector, annotations.Annotations) {
 				return ev.aggregationCountValues(e, sortedGrouping, valueLabel.Val, v[0].(Vector), enh)
 			}, e.Expr)
@@ -1703,6 +1703,7 @@ func (ev *evaluator) eval(ctx context.Context, expr parser.Expr) (parser.Value, 
 		return result, warnings
 
 	case *parser.Call:
+		log.Println("here5")
 		call := FunctionCalls[e.Func.Name]
 		if e.Func.Name == "timestamp" {
 			// Matrix evaluation always returns the evaluation time,
