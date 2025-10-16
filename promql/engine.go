@@ -1029,7 +1029,9 @@ func checkAndExpandSeriesSet(ctx context.Context, expr parser.Expr) (annotations
 		}
 		span := trace.SpanFromContext(ctx)
 		span.AddEvent("expand start", trace.WithAttributes(attribute.String("selector", e.String())))
+		log.Println("here9")
 		series, ws, err := expandSeriesSet(ctx, e.UnexpandedSeriesSet)
+		log.Println("here10")
 		if e.SkipHistogramBuckets {
 			for i := range series {
 				series[i] = newHistogramStatsSeries(series[i])
