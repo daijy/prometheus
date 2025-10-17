@@ -498,15 +498,16 @@ func (ng *Engine) NewInstantQuery(ctx context.Context, q storage.Queryable, opts
 // NewRangeQuery returns an evaluation query for the given time range and with
 // the resolution set by the interval.
 func (ng *Engine) NewRangeQuery(ctx context.Context, q storage.Queryable, opts QueryOpts, qs string, start, end time.Time, interval time.Duration) (Query, error) {
-	log.Println("here111")
 	pExpr, qry := ng.newQuery(q, qs, opts, start, end, interval)
 	finishQueue, err := ng.queueActive(ctx, qry)
 	if err != nil {
 		return nil, err
 	}
 	defer finishQueue()
+	log.Printf("here111 %s", qs)
 	expr, err := parser.ParseExpr(qs)
 	if err != nil {
+		log.Printf("here111 error %v", err)
 		return nil, err
 	}
 	if err := ng.validateOpts(expr); err != nil {
