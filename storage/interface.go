@@ -224,6 +224,9 @@ type SelectHints struct {
 	// When disabled, the result may contain samples outside the queried time range but Select() performances
 	// may be improved.
 	DisableTrimming bool
+
+	ProjectionLabels  []string
+	ProjectionInclude bool
 }
 
 // LabelHints specifies hints passed for label reads.
