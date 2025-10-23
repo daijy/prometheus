@@ -18,7 +18,6 @@ import (
 	"container/heap"
 	"context"
 	"fmt"
-	"log"
 	"math"
 	"sync"
 
@@ -436,14 +435,8 @@ type genericSeriesSetHeap []genericSeriesSet
 func (h genericSeriesSetHeap) Len() int      { return len(h) }
 func (h genericSeriesSetHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
 
-var iii int = 0
-
 func (h genericSeriesSetHeap) Less(i, j int) bool {
 	a, b := h[i].At().Labels(), h[j].At().Labels()
-	if iii%1000 == 0 {
-		log.Printf("jidai compare %s, %s", a.String(), b.String())
-	}
-	iii++
 	return labels.Compare(a, b) < 0
 }
 

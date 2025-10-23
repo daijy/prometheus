@@ -455,6 +455,7 @@ func ErrChunkSeriesSet(err error) ChunkSeriesSet {
 
 // Series exposes a single time series and allows iterating over samples.
 type Series interface {
+	Hash() int64
 	Labels
 	SampleIterable
 }
