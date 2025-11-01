@@ -17,6 +17,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"slices"
 
@@ -576,6 +577,7 @@ func (b *blockBaseSeriesSet) Next() bool {
 		b.curr.labels = b.builder.Labels()
 		b.curr.chks = chks
 		b.curr.intervals = intervals
+		log.Printf("jidai serial: %s, %d", b.curr.labels, len(b.curr.chks))
 		return true
 	}
 	return false
