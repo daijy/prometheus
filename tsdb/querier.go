@@ -513,7 +513,7 @@ func (b *blockBaseSeriesSet) Next() bool {
 			return false
 		}
 
-		log.Println("jidai p.Next %d", len(b.bufChks))
+		log.Printf("jidai p.Next %d", len(b.bufChks))
 		if len(b.bufChks) == 0 {
 			continue
 		}
