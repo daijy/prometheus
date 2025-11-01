@@ -504,6 +504,7 @@ type blockBaseSeriesSet struct {
 func (b *blockBaseSeriesSet) Next() bool {
 	log.Println("jidai Next")
 	for b.p.Next() {
+		log.Println("jidai p.Next")
 		if err := b.index.Series(b.p.At(), &b.builder, &b.bufChks); err != nil {
 			// Postings may be stale. Skip if no underlying series exists.
 			if errors.Is(err, storage.ErrNotFound) {
