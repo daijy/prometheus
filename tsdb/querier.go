@@ -544,7 +544,7 @@ func (b *blockBaseSeriesSet) Next() bool {
 		log.Printf("jidai p.Next %d", len(b.bufChks))
 		for _, chk := range b.bufChks {
 			if chk.MaxTime < b.mint {
-				log.Println("jidai here1")
+				log.Printf("jidai here1, %d, %d", chk.MaxTime, b.mint)
 				continue
 			}
 			if chk.MinTime > b.maxt {
