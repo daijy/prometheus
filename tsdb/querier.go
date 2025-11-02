@@ -541,18 +541,15 @@ func (b *blockBaseSeriesSet) Next() bool {
 		chks := make([]chunks.Meta, 0, nChks)
 
 		// Prefilter chunks and pick those which are not entirely deleted or totally outside of the requested range.
-		log.Printf("jidai p.Next %d, %t", len(b.bufChks), b.disableTrimming)
 		for _, chk := range b.bufChks {
 			// if chk.MaxTime < b.mint {
 			// 	log.Printf("jidai here1, %d, %d", chk.MaxTime, b.mint)
 			// 	continue
 			// }
 			if chk.MinTime > b.maxt {
-				log.Println("jidai here2")
 				continue
 			}
 			if (tombstones.Interval{Mint: chk.MinTime, Maxt: chk.MaxTime}.IsSubrange(intervals)) {
-				log.Println("jidai here3")
 				continue
 			}
 			chks = append(chks, chk)
@@ -582,7 +579,6 @@ func (b *blockBaseSeriesSet) Next() bool {
 		b.curr.labels = b.builder.Labels()
 		b.curr.chks = chks
 		b.curr.intervals = intervals
-		log.Printf("jidai serial: %s, %d", b.curr.labels, len(b.curr.chks))
 		return true
 	}
 	return false
