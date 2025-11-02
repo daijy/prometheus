@@ -543,10 +543,10 @@ func (b *blockBaseSeriesSet) Next() bool {
 		// Prefilter chunks and pick those which are not entirely deleted or totally outside of the requested range.
 		log.Printf("jidai p.Next %d, %t", len(b.bufChks), b.disableTrimming)
 		for _, chk := range b.bufChks {
-			if chk.MaxTime < b.mint {
-				log.Printf("jidai here1, %d, %d", chk.MaxTime, b.mint)
-				continue
-			}
+			// if chk.MaxTime < b.mint {
+			// 	log.Printf("jidai here1, %d, %d", chk.MaxTime, b.mint)
+			// 	continue
+			// }
 			if chk.MinTime > b.maxt {
 				log.Println("jidai here2")
 				continue
