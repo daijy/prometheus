@@ -27,7 +27,6 @@ import (
 	"github.com/prometheus/prometheus/tsdb/chunks"
 	tsdb_errors "github.com/prometheus/prometheus/tsdb/errors"
 	"github.com/prometheus/prometheus/util/annotations"
-	"github.com/thanos-io/thanos/pkg/compact/downsample"
 )
 
 type mergeGenericQuerier struct {
@@ -792,7 +791,7 @@ func (c *compactChunkIterator) Next() bool {
 		if next.MinTime != prev.MinTime ||
 			next.MaxTime != prev.MaxTime ||
 			!bytes.Equal(next.Chunk.Bytes(), prev.Chunk.Bytes()) {
-			if next.Chunk.Encoding() == downsample.ChunkEncAggr {
+			if next.Chunk.Encoding() == chunkenc.Encoding(0xff) {
 				fmt.Printf("Here we are")
 			}
 			// We operate on same series, so labels do not matter here.
