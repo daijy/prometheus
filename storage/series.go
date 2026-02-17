@@ -336,9 +336,7 @@ func (s *seriesToChunkEncoder) Iterator(it chunks.Iterator) chunks.Iterator {
 	i := 0
 	seriesIter := s.Series.Iterator(nil)
 	lastType := chunkenc.ValNone
-	fmt.Println("iiiii 000")
 	for typ := seriesIter.Next(); typ != chunkenc.ValNone; typ = seriesIter.Next() {
-		fmt.Println("iiiii 666")
 		if typ != lastType || i >= seriesToChunkEncoderSplit {
 			// Create a new chunk if the sample type changed or too many samples in the current one.
 			chks = appendChunk(chks, mint, maxt, chk)
@@ -364,11 +362,9 @@ func (s *seriesToChunkEncoder) Iterator(it chunks.Iterator) chunks.Iterator {
 		)
 		switch typ {
 		case chunkenc.ValFloat:
-			fmt.Println("iiiii 111")
 			t, v = seriesIter.At()
 			app.Append(t, v)
 		case chunkenc.ValHistogram:
-			fmt.Println("iiiii 222")
 			t, h = seriesIter.AtHistogram(nil)
 			newChk, recoded, app, err = app.AppendHistogram(nil, t, h, false)
 			if err != nil {
@@ -384,7 +380,6 @@ func (s *seriesToChunkEncoder) Iterator(it chunks.Iterator) chunks.Iterator {
 				chk = newChk
 			}
 		case chunkenc.ValFloatHistogram:
-			fmt.Println("iiiii 333")
 			t, fh = seriesIter.AtFloatHistogram(nil)
 			newChk, recoded, app, err = app.AppendFloatHistogram(nil, t, fh, false)
 			if err != nil {
@@ -400,7 +395,6 @@ func (s *seriesToChunkEncoder) Iterator(it chunks.Iterator) chunks.Iterator {
 				chk = newChk
 			}
 		default:
-			fmt.Println("iiiii 444")
 			return errChunksIterator{err: fmt.Errorf("unknown sample type %s", typ.String())}
 		}
 
@@ -415,8 +409,15 @@ func (s *seriesToChunkEncoder) Iterator(it chunks.Iterator) chunks.Iterator {
 	}
 
 	chks = appendChunk(chks, mint, maxt, chk)
-	fmt.Printf("iiiii 555 %d\n", len(chks))
+	for i, chk := range chks {
+		iter := chk.Chunk.Iterator(nil)
+		for iter.Next() != chunkenc.ValNone {
+			t, v := iter.At()
+			fmt.Printf("ffffff %d: %d, %f", i, t, v)
+		}
+	}
 
+	fmt.Printf("ffdddd %v", existing)
 	if existing {
 		lcsi.Reset(chks...)
 		return lcsi
