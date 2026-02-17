@@ -336,7 +336,9 @@ func (s *seriesToChunkEncoder) Iterator(it chunks.Iterator) chunks.Iterator {
 	i := 0
 	seriesIter := s.Series.Iterator(nil)
 	lastType := chunkenc.ValNone
+	fmt.Println("iiiii 000")
 	for typ := seriesIter.Next(); typ != chunkenc.ValNone; typ = seriesIter.Next() {
+		fmt.Println("iiiii 666")
 		if typ != lastType || i >= seriesToChunkEncoderSplit {
 			// Create a new chunk if the sample type changed or too many samples in the current one.
 			chks = appendChunk(chks, mint, maxt, chk)
