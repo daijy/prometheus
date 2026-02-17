@@ -409,15 +409,7 @@ func (s *seriesToChunkEncoder) Iterator(it chunks.Iterator) chunks.Iterator {
 	}
 
 	chks = appendChunk(chks, mint, maxt, chk)
-	for i, chk := range chks {
-		iter := chk.Chunk.Iterator(nil)
-		for iter.Next() != chunkenc.ValNone {
-			t, v := iter.At()
-			fmt.Printf("ffffff %d: %d, %f", i, t, v)
-		}
-	}
 
-	fmt.Printf("ffdddd %v", existing)
 	if existing {
 		lcsi.Reset(chks...)
 		return lcsi
