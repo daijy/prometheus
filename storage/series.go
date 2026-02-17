@@ -334,14 +334,9 @@ func (s *seriesToChunkEncoder) Iterator(it chunks.Iterator) chunks.Iterator {
 	}
 
 	i := 0
-	fmt.Printf("iiiii aaa %s\n", s.Series.Labels().String())
 	seriesIter := s.Series.Iterator(nil)
 	lastType := chunkenc.ValNone
 	fmt.Println("iiiii 000")
-	for seriesIter.Next() != chunkenc.ValNone {
-		t, v := seriesIter.At()
-		fmt.Printf("iiiii 111 %d, %f", t, v)
-	}
 	for typ := seriesIter.Next(); typ != chunkenc.ValNone; typ = seriesIter.Next() {
 		fmt.Println("iiiii 666")
 		if typ != lastType || i >= seriesToChunkEncoderSplit {
